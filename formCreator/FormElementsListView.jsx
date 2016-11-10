@@ -1,4 +1,5 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
 import {AgGridReact} from 'ag-grid-react';
 import '../assets/styles/ag-grid.css';
 import '../assets/styles/theme-bootstrap.css';
@@ -7,6 +8,7 @@ import 'babel-polyfill';
 import update from 'immutability-helper';
 import { Row,Button ,Col} from 'react-bootstrap';
 import FormPreview from '../formpreview/FormPreview.jsx'
+import FormElementDeleteRenderer from './FormElementDeleteRenderer.jsx'
 
 class FormElementsListView extends React.Component {
 
@@ -31,8 +33,8 @@ class FormElementsListView extends React.Component {
 			{
 				if(rows.rowsToDisplay[g].data.fieldGrouping == formElement.fieldGrouping )
 				{	
-					groupDataMatched = true
-					rows.rowsToDisplay[g].data.children.push({fieldName:formElement.fieldName,fieldType:'Radio',fieldMapping:formElement.fieldMapping,leaf:true})
+					groupDataMatched = true					
+					rows.rowsToDisplay[g].data.children.push({fieldId:rows.rowsToDisplay[g].data.fieldId+'-'+rows.rowsToDisplay[g].data.children.length,fieldName:formElement.fieldName,fieldType:'Radio',fieldMapping:formElement.fieldMapping,leaf:true})
 					
 				}
 			}
@@ -40,14 +42,14 @@ class FormElementsListView extends React.Component {
 		}
 		else
 		{	
-			rows.rowsToDisplay.push({data:{fieldName:formElement.fieldName,fieldType:formElement.fieldType,fieldMapping:formElement.fieldMapping}})
+			rows.rowsToDisplay.push({data:{fieldId:rows.rowsToDisplay.length,fieldName:formElement.fieldName,fieldType:formElement.fieldType,fieldMapping:formElement.fieldMapping}})
 		}
 
 		if(groupData && !groupDataMatched)
 		{
 			formElement.group = true;
 			formElement.children = [];
-			rows.rowsToDisplay.push({data:{group:true,children:[],fieldGrouping:formElement.fieldGrouping,fieldName:formElement.fieldName}})
+			rows.rowsToDisplay.push({data:{fieldId:rows.rowsToDisplay.length,group:true,children:[],fieldGrouping:formElement.fieldGrouping,fieldName:formElement.fieldName}})
 		}
 
 		
@@ -87,22 +89,100 @@ class FormElementsListView extends React.Component {
 
 	innerCellRenderer(params) {
 
-		
+		//console.log('Inner cell rebner '+params.data.fieldName)
         return params.data.fieldName;
     }
+
+    deleteFormItem(params)
+     {
+     	//console.log('Need to Delete item '+params.data.fieldId);
+
+     	var gridArray = this.formElementGrid.api.getModel().rowsToDisplay;
+     	
+     	
+     	gridArray = this.pluck(gridArray,'data')
+     	
+     	console.log(' grid array  '+gridArray.length)
+     	gridArray.every(function(node,index){
+
+     		if(node.children && node.children.length >0)
+     		{	
+     			
+
+     			node.children.every(function(childNode,childIndex)
+     			{	
+
+     				if(params.data.fieldId == childNode.fieldId)
+     				{	
+     					console.log('inner index '+index)
+     					node.children.splice(childIndex,1)
+     					//return false
+
+     				}
+
+     				return true
+     				
+     				    				
+     			})
+     		}
+     		
+     		//console.log('filedId '+node.fieldId + ' ' +params.data.fieldId )
+     		if(params.data.fieldId == node.fieldId )
+     		{	
+     			console.log('index '+index)
+     			gridArray.splice(index,1)
+     			//return false
+     			
+     		}
+
+     		return true
+
+     	});    	
+
+     	
+		//console.log(' grid array  s'+gridArray[0].fieldName)
+		this.formElementGrid.api.setRowData([])
+		this.setState({gridData:gridArray}); 
+		this.formElementGrid.api.setRowData(this.state.gridData)
+     	
+     	
+     	
+     }
+     
+
+     componentDidMount() 
+     {     
+      this.formElementGrid.api.addEventListener('deleteFormItem',this.deleteFormItem.bind(this))
+   	 }
+
 
   	render (){
 
   		var columns = [{headerName:'Field Name',field:'fieldName', cellRendererParams: {
 			                innerRenderer: this.innerCellRenderer.bind(this)
-			            },
-  						cellClass: 'agGridCellWidth',cellRenderer: 'group'},{headerName:'Field Type',field:'fieldType',cellClass: 'agGridCellWidth'},{headerName:'Field Mapping',field:'fieldMapping',cellClass: 'agGridCellWidth'}]
+			            },cellClass: 'agGridCellWidth',cellRenderer: 'group'},
+			            {headerName:'Field Type',field:'fieldType',cellClass: 'agGridCellWidth'},
+  						{headerName:'Field Mapping',field:'fieldMapping',cellClass: 'agGridCellWidth'},
+  						{headerName:'Radio Field Grouping',field:'fieldGrouping',cellClass: 'agGridCellWidth'},
+  						{headerName:'Delete',field:'testr',cellClass: 'agGridCellWidth',
+  						  cellRenderer:function(params)
+						  {	
+								 	
+							 var eParentElement = params.eParentOfValue;						 
+							 ReactDOM.render(<FormElementDeleteRenderer gridParams ={params}/>, eParentElement);
+							
+							 params.addRenderedRowListener('renderedRowRemoved', () => {
+								            ReactDOM.unmountComponentAtNode(eParentElement);
+								        });						
+							return null
+						}
+}]
    		
   
 
   		return (
 
-			<div className="ag-fresh" style = {{width:"42.5%",height:"250px"}}>
+			<div className="ag-fresh" style = {{width:"63%",height:"250px"}}>
 				<AgGridReact
 				    // column definitions and row data are immutable, the grid
 				    // will update when these lists change
@@ -115,10 +195,10 @@ class FormElementsListView extends React.Component {
 				    rowSelection="multiple"
 				    enableSorting="true"
 				    enableFilter="true"
-				    rowHeight="22"
+				    rowHeight="38"
 				    style = {{width:"100%",height:"220px"}}
 				    getNodeChildDetails = {function(element) {
-												            if (element.group && element.children.length >0) {
+												            if (element.group && element.children && element.children.length >0) {
 												                return {
 												                    group: true,
 												                    children: element.children,
