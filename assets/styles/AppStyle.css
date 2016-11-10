@@ -1,0 +1,114 @@
+.defaultMargin
+{
+	margin: 4px;
+}
+
+.defaultPadding
+{
+	padding:2px;
+}
+
+.creatorPanelStyle
+{
+	width:75%;		
+}
+
+.boldHeader
+{
+	font-weight:bold !important ;
+}
+
+body #app
+{
+	margin:6px;
+	border:1px;	
+}
+
+#agHeaderCellLabel
+{
+
+	text-align: left;
+}
+
+.agGridCellWidth
+{
+	width:100px;
+}
+
+.row.defaultOverride
+{
+	margin-left: 0px
+}
+
+.panel.defaultPanelOverride
+{
+	margin-bottom: 6px;
+	margin-left: 2px
+}
+
+.radio.radioOverride
+{
+	margin:4px;
+	padding:4px;
+}
+
+.ag-body-viewport
+{
+	overflow-x: hidden;
+}
+
+.modal-body
+{
+	padding:4px;
+}
+
+.custom-modal
+{
+	width:75%;
+}
+
+
+.vcenter {
+    display: inline-block;
+    vertical-align: middle;
+    float: none;
+    text-align: right
+}
+
+.truncate {
+  width: 100px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.autoWidth {
+  width: auto !important;
+  
+}
+
+
+
+.radio label {
+
+	font-weight: 700;	
+	margin-bottom: -4px
+}
+
+
+.checkbox label {
+
+	font-weight: 700;	
+	margin-bottom: -4px
+	
+}
+
+.setPosition
+{
+	position:absolute;
+	right:0px;
+}
+
+
+
+
