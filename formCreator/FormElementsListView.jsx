@@ -73,8 +73,8 @@ class FormElementsListView extends React.Component {
 		this.formPreview.showPreview(formElementsData)
 	}
 
-	pluck(array, key) {
-
+	pluck(array, key) 
+	{
 		var newArray = [];
 		for(var a = 0 ;a < array.length ;a ++)
 		{
@@ -87,65 +87,48 @@ class FormElementsListView extends React.Component {
 	   return newArray;
 	}
 
-	innerCellRenderer(params) {
-
-		//console.log('Inner cell rebner '+params.data.fieldName)
+	innerCellRenderer(params) 
+	{
         return params.data.fieldName;
     }
 
     deleteFormItem(params)
-     {
-     	//console.log('Need to Delete item '+params.data.fieldId);
-
-     	var gridArray = this.formElementGrid.api.getModel().rowsToDisplay;
-     	
-     	
+    {
+     	var gridArray = this.formElementGrid.api.getModel().rowsToDisplay;  
      	gridArray = this.pluck(gridArray,'data')
-     	
-     	console.log(' grid array  '+gridArray.length)
+     	     	
      	gridArray.every(function(node,index){
 
      		if(node.children && node.children.length >0)
-     		{	
-     			
-
+     		{
      			node.children.every(function(childNode,childIndex)
-     			{	
+     			{
 
      				if(params.data.fieldId == childNode.fieldId)
      				{	
      					console.log('inner index '+index)
      					node.children.splice(childIndex,1)
-     					//return false
-
+     					return false
      				}
 
-     				return true
-     				
-     				    				
+     				return true		
      			})
      		}
      		
-     		//console.log('filedId '+node.fieldId + ' ' +params.data.fieldId )
      		if(params.data.fieldId == node.fieldId )
-     		{	
-     			console.log('index '+index)
+     		{
      			gridArray.splice(index,1)
-     			//return false
+     			return false
      			
      		}
 
      		return true
 
-     	});    	
-
-     	
-		//console.log(' grid array  s'+gridArray[0].fieldName)
+     	});    
+		
 		this.formElementGrid.api.setRowData([])
 		this.setState({gridData:gridArray}); 
 		this.formElementGrid.api.setRowData(this.state.gridData)
-     	
-     	
      	
      }
      
