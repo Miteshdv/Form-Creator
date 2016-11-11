@@ -10,12 +10,22 @@ class App extends React.Component {
 		this.agGrid.addElement(formElement);
 	}
 
+	editFormElement(selectedItem)
+	{	
+		this.formCreatorView.editFormElement(selectedItem);
+	}
+
+	updateFormElement(formElement)
+	{
+		this.agGrid.updateFormElement(formElement);
+	}
+
 	render(){
 		return ( 	
 				
 			<div style= {{width:'100%'}}>				
-				<FormCreatorView addFormElement = {this.addElement.bind(this)}/>
-				<FormElementsListView ref={(grid) => this.agGrid = grid}/>
+				<FormCreatorView ref={(form) => this.formCreatorView = form} addFormElement = {this.addElement.bind(this)} updateFormElement = {this.updateFormElement.bind(this)}/>
+				<FormElementsListView ref={(grid) => this.agGrid = grid} editFormElement = {this.editFormElement.bind(this)}/>
 			</div>
 				
 				

@@ -89,7 +89,7 @@ class FormPreview extends React.Component {
 
 			
 			
-			if(colCounter > 3)
+			if(colCounter > 2)
 			{			
 				rowElements =[];				
 				colCounter = 0 ;

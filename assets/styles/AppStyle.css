@@ -87,7 +87,9 @@ body #app
   
 }
 
-
+.col-md-3 {
+    width: 33%;
+}
 
 .radio label {
 

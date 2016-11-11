@@ -34,7 +34,7 @@ class FormElementsListView extends React.Component {
 				if(rows.rowsToDisplay[g].data.fieldGrouping == formElement.fieldGrouping )
 				{	
 					groupDataMatched = true					
-					rows.rowsToDisplay[g].data.children.push({fieldId:rows.rowsToDisplay[g].data.fieldId+'-'+rows.rowsToDisplay[g].data.children.length,fieldName:formElement.fieldName,fieldType:'Radio',fieldMapping:formElement.fieldMapping,leaf:true})
+					rows.rowsToDisplay[g].data.children.push({fieldId:rows.rowsToDisplay[g].data.fieldId+'-'+rows.rowsToDisplay[g].data.children.length,fieldName:formElement.fieldName,fieldType:'Radio',leaf:true})
 					
 				}
 			}
@@ -42,7 +42,7 @@ class FormElementsListView extends React.Component {
 		}
 		else
 		{	
-			rows.rowsToDisplay.push({data:{fieldId:rows.rowsToDisplay.length,fieldName:formElement.fieldName,fieldType:formElement.fieldType,fieldMapping:formElement.fieldMapping}})
+			rows.rowsToDisplay.push({data:{fieldId:rows.rowsToDisplay.length,fieldName:formElement.fieldName,fieldType:formElement.fieldType}})
 		}
 
 		if(groupData && !groupDataMatched)
@@ -70,7 +70,7 @@ class FormElementsListView extends React.Component {
 	launchFormPreview()
 	{
 		var formElementsData = this.pluck(this.formElementGrid.api.getModel().rowsToDisplay,'data')
-		this.formPreview.showPreview(formElementsData)
+		this.props.editFormElement(this.formPreview.showPreview(formElementsData))
 	}
 
 	pluck(array, key) 
@@ -92,6 +92,51 @@ class FormElementsListView extends React.Component {
         return params.data.fieldName;
     }
 
+    itemSelectionChange()
+    {
+    	this.props.editFormElement(this.formElementGrid.api.getSelectedRows()[0])
+    }
+
+    updateFormElement(formElement)
+   	{
+   		var gridArray = this.formElementGrid.api.getModel().rowsToDisplay;  
+     	gridArray = this.pluck(gridArray,'data')
+     	     	
+     	gridArray.every(function(node,index){
+
+     		if(node.children && node.children.length >0)
+     		{
+     			node.children.every(function(childNode,childIndex)
+     			{
+
+     				if(formElement.fieldId == childNode.fieldId)
+     				{	
+     					node.children[childIndex].fieldName = formElement.fieldName;     					
+     					return false
+     				}
+
+     				return true		
+     			})
+     		}
+     		
+     		if(formElement.fieldId == node.fieldId )
+     		{
+     			gridArray[index].fieldName = formElement.fieldName
+     			gridArray[index].fieldType = formElement.fieldType; 
+     			return false
+     			
+     		}
+
+     		return true
+
+     	});    
+		
+		this.formElementGrid.api.setRowData([])
+		this.setState({gridData:gridArray}); 
+		this.formElementGrid.api.setRowData(this.state.gridData)
+     	
+   	}
+
     deleteFormItem(params)
     {
      	var gridArray = this.formElementGrid.api.getModel().rowsToDisplay;  
@@ -106,7 +151,6 @@ class FormElementsListView extends React.Component {
 
      				if(params.data.fieldId == childNode.fieldId)
      				{	
-     					console.log('inner index '+index)
      					node.children.splice(childIndex,1)
      					return false
      				}
@@ -144,8 +188,7 @@ class FormElementsListView extends React.Component {
   		var columns = [{headerName:'Field Name',field:'fieldName', cellRendererParams: {
 			                innerRenderer: this.innerCellRenderer.bind(this)
 			            },cellClass: 'agGridCellWidth',cellRenderer: 'group'},
-			            {headerName:'Field Type',field:'fieldType',cellClass: 'agGridCellWidth'},
-  						{headerName:'Field Mapping',field:'fieldMapping',cellClass: 'agGridCellWidth'},
+			            {headerName:'Field Type',field:'fieldType',cellClass: 'agGridCellWidth'},  						
   						{headerName:'Radio Field Grouping',field:'fieldGrouping',cellClass: 'agGridCellWidth'},
   						{headerName:'Delete',field:'testr',cellClass: 'agGridCellWidth',
   						  cellRenderer:function(params)
@@ -165,7 +208,7 @@ class FormElementsListView extends React.Component {
 
   		return (
 
-			<div className="ag-fresh" style = {{width:"63%",height:"250px"}}>
+			<div className="ag-fresh" style = {{width:"56.4%",height:"250px"}}>
 				<AgGridReact
 				    // column definitions and row data are immutable, the grid
 				    // will update when these lists change
@@ -174,11 +217,13 @@ class FormElementsListView extends React.Component {
 				    headerCellRenderer = {this.headerCellRendererFunc.bind(this)}
 				    ref={(grid) => this.formElementGrid = grid}
 				    rememberGroupStateWhenNewData="true"
+				    onSelectionChanged =  {this.itemSelectionChange.bind(this)}
+
 				    // or provide props the old way with no binding
 				    rowSelection="multiple"
 				    enableSorting="true"
 				    enableFilter="true"
-				    rowHeight="38"
+				    rowHeight="36"
 				    style = {{width:"100%",height:"220px"}}
 				    getNodeChildDetails = {function(element) {
 												            if (element.group && element.children && element.children.length >0) {
@@ -214,7 +259,9 @@ class FormElementsListView extends React.Component {
 }
 
 FormElementsListView.propTypes = {
-	addElement:React.PropTypes.func
+	addElement:React.PropTypes.func,
+	editFormElement:React.PropTypes.func,
+	updateFormElement:React.PropTypes.func
 }
 
 
