@@ -7,7 +7,8 @@ import '../assets/styles/theme-fresh.css';
 import 'babel-polyfill';
 import update from 'immutability-helper';
 import { Row,Button ,Col} from 'react-bootstrap';
-import FormPreview from '../formpreview/FormPreview.jsx'
+import FormPreview from '../formpreview/FormPreview.jsx';
+import FormReOrderView from '../formElementsReorder/FormReOrderView.jsx';
 import FormElementDeleteRenderer from './FormElementDeleteRenderer.jsx';
 
 class FormElementsListView extends React.Component {
@@ -72,7 +73,13 @@ class FormElementsListView extends React.Component {
 	launchFormPreview()
 	{
 		var formElementsData = this.pluck(this.formElementGrid.api.getModel().rowsToDisplay,'data')
-		this.props.editFormElement(this.formPreview.showPreview(formElementsData))
+		this.formPreview.showPreview(formElementsData)
+	}
+
+	launchFormReOrderView()
+	{
+		var formElementsData = this.pluck(this.formElementGrid.api.getModel().rowsToDisplay,'data')
+		this.formReOrderView.showListOrder(formElementsData)
 	}
 
 	pluck(array, key) 
@@ -215,6 +222,13 @@ class FormElementsListView extends React.Component {
    	 	}
    	 }
 
+   	 reOrderFormElements(formElements)
+   	 {
+   	 	this.formElementGrid.api.setRowData([])
+		this.setState({gridData:formElements}); 
+		this.formElementGrid.api.setRowData(this.state.gridData)
+   	 }
+
 
   	render (){
 
@@ -274,7 +288,7 @@ class FormElementsListView extends React.Component {
 
 				<div className="row defaultOverride" style = {{marginTop:'5px'}}>
 					<div className = "col-*-*">
-						<Button type ="button" style = {{marginRight:'5px'}}>
+						<Button type ="button" style = {{marginRight:'5px'}} onClick ={this.launchFormReOrderView.bind(this)}>
 						      Re-Order
 					   </Button>
 					   <Button type ="button" onClick ={this.launchFormPreview.bind(this)}>
@@ -284,6 +298,7 @@ class FormElementsListView extends React.Component {
 				</div>
 				 
 				<FormPreview  ref={(form) => this.formPreview = form} style = {{width:"75%"}}/>
+				<FormReOrderView  ref={(form) => this.formReOrderView = form}  updateSorting= {this.reOrderFormElements.bind(this)}/>
 			</div>	
 		)
 
