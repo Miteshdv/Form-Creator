@@ -8,14 +8,16 @@ import 'babel-polyfill';
 import update from 'immutability-helper';
 import { Row,Button ,Col} from 'react-bootstrap';
 import FormPreview from '../formpreview/FormPreview.jsx'
-import FormElementDeleteRenderer from './FormElementDeleteRenderer.jsx'
+import FormElementDeleteRenderer from './FormElementDeleteRenderer.jsx';
 
 class FormElementsListView extends React.Component {
+
+   
 
    constructor(props)
 	{
 		super(props)
-		this.state = {gridData:[]}
+		this.state = {gridData:[],isDelete:false}
 	}
 
 
@@ -34,7 +36,7 @@ class FormElementsListView extends React.Component {
 				if(rows.rowsToDisplay[g].data.fieldGrouping == formElement.fieldGrouping )
 				{	
 					groupDataMatched = true					
-					rows.rowsToDisplay[g].data.children.push({fieldId:rows.rowsToDisplay[g].data.fieldId+'-'+rows.rowsToDisplay[g].data.children.length,fieldName:formElement.fieldName,fieldType:'Radio',leaf:true})
+					rows.rowsToDisplay[g].data.children.push({fieldId:rows.rowsToDisplay[g].data.fieldId+'-'+rows.rowsToDisplay[g].data.children.length,fieldName:formElement.fieldName,fieldType:'Radio',leaf:true,fieldGrouping:formElement.fieldGrouping})
 					
 				}
 			}
@@ -93,8 +95,17 @@ class FormElementsListView extends React.Component {
     }
 
     itemSelectionChange()
-    {
-    	this.props.editFormElement(this.formElementGrid.api.getSelectedRows()[0])
+    {	
+    	if(!this.state.isDelete)
+    	{
+    		this.props.editFormElement(this.formElementGrid.api.getSelectedRows()[0])
+    	}
+    	else
+    	{
+    		this.setState({isDelete:false})
+    	}
+    	
+    	
     }
 
     updateFormElement(formElement)
@@ -173,13 +184,35 @@ class FormElementsListView extends React.Component {
 		this.formElementGrid.api.setRowData([])
 		this.setState({gridData:gridArray}); 
 		this.formElementGrid.api.setRowData(this.state.gridData)
-     	
+     	this.props.clearFormSelection();
      }
      
 
      componentDidMount() 
      {     
       this.formElementGrid.api.addEventListener('deleteFormItem',this.deleteFormItem.bind(this))
+   	 }
+
+   	 shouldComponentUpdate(nextProps,nextState)
+   	 {	
+   	 	if(nextState.isDelete != this.state.isDelete)
+   	 	{	
+   	 		return false
+   	 	}
+   	 	else
+   	 	{
+   	 		return true
+   	 	}
+   	 }
+
+
+   	 cellSelected(cellParams)
+   	 {
+   	 	if(cellParams.colDef.headerName == "Delete")
+   	 	{
+   	 		
+   	 		this.setState({isDelete:true})
+   	 	}
    	 }
 
 
@@ -218,7 +251,7 @@ class FormElementsListView extends React.Component {
 				    ref={(grid) => this.formElementGrid = grid}
 				    rememberGroupStateWhenNewData="true"
 				    onSelectionChanged =  {this.itemSelectionChange.bind(this)}
-
+				    onCellClicked = {this.cellSelected.bind(this)}
 				    // or provide props the old way with no binding
 				    rowSelection="multiple"
 				    enableSorting="true"
@@ -261,7 +294,8 @@ class FormElementsListView extends React.Component {
 FormElementsListView.propTypes = {
 	addElement:React.PropTypes.func,
 	editFormElement:React.PropTypes.func,
-	updateFormElement:React.PropTypes.func
+	updateFormElement:React.PropTypes.func,
+	clearFormSelection:React.PropTypes.func
 }
 
 

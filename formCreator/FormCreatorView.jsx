@@ -27,6 +27,11 @@ class FormCreatorView extends React.Component {
 		this.clearInputFields();
 	}
 
+	clearFormElementOnDelete()
+	{
+		this.onClickClearFormElementBtn()
+	}
+
 	onClickUpdateFormElementBtn()
 	{	
 		this.props.updateFormElement(Object.assign({},this.state.formElementObj))
