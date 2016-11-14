@@ -16,7 +16,7 @@ class FormCreatorView extends React.Component {
 	{
 		
 		var updateBtnState = update(this.state.buttonState,{addBtnEnable:{$set:false},updateBtnEnable:{$set:true},clearBtnEnable:{$set:true}})		
-		var formObj = update(this.state.formElementObj,{fieldId:{$set:element.fieldId},fieldName:{$set:element.fieldName},fieldType:{$set:element.fieldType},fieldGrouping:{$set:element.fieldGrouping?'':element.fieldGrouping}})
+		var formObj = update(this.state.formElementObj,{fieldId:{$set:element.fieldId},fieldName:{$set:element.fieldName},fieldType:{$set:element.fieldType},fieldGrouping:{$set:element.fieldGrouping == undefined?'-':element.fieldGrouping}})
 		
 		this.setState({formElementObj:formObj,buttonState:updateBtnState,disableGrpInput:true})	
 	}
