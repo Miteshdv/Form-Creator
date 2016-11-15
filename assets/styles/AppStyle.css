@@ -172,3 +172,17 @@ body #app
     z-index: 100000
 }
 
+input:required {
+    background: #fff url(/assets/images/asterisk-icon.png) no-repeat 98% center;
+}
+
+.validationInput:focus:invalid { /* when a field is considered invalid by the browser */
+    background: #fff url(/assets/images/invalidate_error.png) no-repeat 98% center;
+    box-shadow: 0 0 5px #d45252;
+    border-color: #b03535
+}
+
+.validationInput:valid{ /* when a field is considered valid by the browser */
+    background: none;   
+}
+

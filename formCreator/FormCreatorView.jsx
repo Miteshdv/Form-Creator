@@ -1,4 +1,5 @@
 import React from 'react';
+import ReactDOM from 'react-dom'
 import { Button , Form , FormGroup ,FormControl ,ControlLabel , Col ,Row ,Label , Grid} from 'react-bootstrap';
 import update from 'immutability-helper';
 
@@ -22,9 +23,17 @@ class FormCreatorView extends React.Component {
 	}
 
 	onClickAddFormElementBtn()
-	{
-		this.props.addFormElement(Object.assign({},this.state.formElementObj))
-		this.clearInputFields();
+	{	
+		if(ReactDOM.findDOMNode(this.fieldNameInputId).checkValidity())
+		{
+			this.props.addFormElement(Object.assign({},this.state.formElementObj))
+			this.clearInputFields();
+		}
+		else
+		{
+			ReactDOM.findDOMNode(this.fieldNameInputId).focus()
+		}
+		
 	}
 
 	clearFormElementOnDelete()
@@ -34,8 +43,16 @@ class FormCreatorView extends React.Component {
 
 	onClickUpdateFormElementBtn()
 	{	
-		this.props.updateFormElement(Object.assign({},this.state.formElementObj))
-		this.onClickClearFormElementBtn();
+		if(ReactDOM.findDOMNode(this.fieldNameInputId).checkValidity())
+		{	
+			this.props.updateFormElement(Object.assign({},this.state.formElementObj))
+			this.onClickClearFormElementBtn();
+		}
+		else
+		{
+			ReactDOM.findDOMNode(this.fieldNameInputId).focus()
+		}
+		
 	}
 
 	onClickClearFormElementBtn()
@@ -65,7 +82,7 @@ class FormCreatorView extends React.Component {
 				<div className="panel defaultPanelOverride panel-default creatorPanelStyle" >
 				  <div className="panel-heading boldHeader">Create Form</div>
 				  <div className="panel-body">
-				  	<Form className="defaultMargin" inline>
+				  	<Form className="defaultMargin" inline ref={(form) => this.formFieldsCreator = form}>
 				  	 <Grid style= {{width:'100%',marignLeft:'0px'}}>
 					  <Row className="show-grid" style = {{marginTop:"15px"}}>
 					   <Col sm={4} md={4} className = "vcenter">
@@ -74,7 +91,9 @@ class FormCreatorView extends React.Component {
 					     <FormControl type="text" ref={(input) => this.fieldNameInputId = input}
 					     			  onChange = {this.onElementValueChange.bind(this)}	
 					     			  value = {this.state.formElementObj.fieldName}						     			  			     			  
-					     			  className = "setPosition"
+					     			  className = "setPosition validationInput"	
+					     			  pattern = "^[-_a-zA-Z0-9]+(\s+[-_a-zA-Z0-9]+)*$"				     			 
+					     			  required
 					     			  />					     
 					    </FormGroup>
 					    </Col>
